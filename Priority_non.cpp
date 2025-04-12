@@ -8,7 +8,7 @@ using namespace std;
 class priority_non{
     public:
         vector<process> &processes;
-        vector<process*> waiting;
+        vector<process*> ready;
         int time;
         bool is_busy;
         process *curr_process;
@@ -40,16 +40,16 @@ class priority_non{
             int n=processes.size();
             for (int i = 0; i < n; i++)
             {
-                if(time==processes[i].arrival_time) waiting.push_back(&processes[i]); //checks if new process has arrived
+                if(time==processes[i].arrival_time) ready.push_back(&processes[i]); //checks if new process has arrived
             }
 
             time++;
             if(!is_busy){
-                sort(waiting.begin(),waiting.end(),priority_non::priority_sorting); //sorting waiting queue according to priority
-                if(!waiting.empty()){
+                sort(ready.begin(),ready.end(),priority_non::priority_sorting); //sorting ready queue according to priority
+                if(!ready.empty()){
                     is_busy=true;
-                    curr_process = waiting.back();
-                    waiting.pop_back();
+                    curr_process = ready.back();
+                    ready.pop_back();
                     curr_process->burst_time--;
                     if(curr_process->burst_time==0){
                         is_busy=false;
@@ -83,19 +83,23 @@ int main(){
     vector<process> p = {process(1,0,3,2),process(2,2,6,1),process(3,5,1,3),process(4,9,2,2),process(5,12,4,2)};
     priority_non p1(p);
     int temp=0;
+    int cnt=0;
     while (temp!=-2)
     {
         temp=p1.get_process();
         if(temp==-2) continue;
-        cout<<temp<<endl;
+        cout<<"TIMESTEP "<<cnt<<" : "<<temp<<endl;
+        cnt++;
     }
 
+
+    float avg_tat=0,avg_wt=0;
     for (int i = 0; i < p.size(); i++)
     {
-        cout<<p[i].waiting_time<<" - ";
+        avg_wt+=p[i].waiting_time;
+        avg_tat+=p[i].turn_around_time;
     }
-        for (int i = 0; i < p.size(); i++)
-    {
-        cout<<p[i].turn_around_time<<" - ";
-    }
+
+    cout<<"avg turn around = "<<avg_tat/p.size()<<endl;
+    cout<<"avg waiting = "<<avg_wt/p.size()<<endl;
 }
