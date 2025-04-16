@@ -146,7 +146,7 @@ private slots:
 
         // Create the thread and worker
         thread = new QThread;
-        worker = new SimulationWorker(myprocesses, selectedAlgorithm, liveMode, quantum->value());
+        worker = new SimulationWorker(myprocesses, selectedAlgorithm, liveMode, arrival, quantum->value());
         worker->moveToThread(thread);
 
         // Connect signals and slots
@@ -236,7 +236,9 @@ private slots:
         processRect->setBrush(QBrush(Qt::white));  // Set color for the process
 
         // Create text to show the process ID, centered within the rectangle
-        QGraphicsTextItem *processText = new QGraphicsTextItem(QString::number(processId));
+        QGraphicsTextItem *processText;
+        if(processId==0) processText = new QGraphicsTextItem("idle");
+        else processText = new QGraphicsTextItem(QString::number(processId));
 
         // Adjust text position to center it inside the rectangle
         processText->setPos(currentXPosition + (rectWidth - processText->boundingRect().width()) / 2,

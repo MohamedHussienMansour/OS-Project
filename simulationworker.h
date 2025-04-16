@@ -3,11 +3,12 @@
 #include <QObject>
 #include <vector>
 #include "process.h"
+#include <QSpinBox>
 
 class SimulationWorker : public QObject {
     Q_OBJECT
 public:
-    SimulationWorker(std::vector<process> &processes, const QString& algorithmType, bool liveMode, int quantum);
+    SimulationWorker(std::vector<process> &processes, const QString& algorithmType, bool liveMode,QSpinBox *arrive, int quantum);
     void requestStop();
 
 signals:
@@ -23,4 +24,5 @@ private:
     QString algorithm;
     bool isLive;
     int quant;
+    QSpinBox *arrival;
 };

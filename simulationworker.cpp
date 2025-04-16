@@ -9,15 +9,18 @@
 #include <chrono>
 #include <QDebug>
 
-SimulationWorker::SimulationWorker(std::vector<process> &processes, const QString& algorithmType, bool liveMode, int quantam)
-    : myProcesses(processes), algorithm(algorithmType), isLive(liveMode), quant(quantam) {}
+SimulationWorker::SimulationWorker(std::vector<process> &processes, const QString& algorithmType, bool liveMode, QSpinBox *arrive, int quantam)
+    : myProcesses(processes), algorithm(algorithmType), isLive(liveMode), quant(quantam), arrival(arrive) {}
 
 void SimulationWorker::run() {
+    int minimum=0;
     if(algorithm=="Round Robin"){
         round_robin p1(myProcesses,quant);
         int temp = 0;
 
         while (temp != -2 && !stopRequestedFlag) {
+            minimum++;
+            arrival->setMinimum(minimum);
             temp = p1.get_process();
 
             if (temp == -2) continue;
@@ -33,6 +36,8 @@ void SimulationWorker::run() {
         int temp = 0;
 
         while (temp != -2 && !stopRequestedFlag) {
+            minimum++;
+            arrival->setMinimum(minimum);
             temp = p1.get_process();
 
             if (temp == -2) continue;
@@ -47,6 +52,8 @@ void SimulationWorker::run() {
         int temp = 0;
 
         while (temp != -2 && !stopRequestedFlag) {
+            minimum++;
+            arrival->setMinimum(minimum);
             temp = p1.get_process();
 
             if (temp == -2) continue;
@@ -61,6 +68,8 @@ void SimulationWorker::run() {
         int temp = 0;
 
         while (temp != -2 && !stopRequestedFlag) {
+            minimum++;
+            arrival->setMinimum(minimum);
             temp = p1.get_process();
 
             if (temp == -2) continue;
@@ -75,6 +84,8 @@ void SimulationWorker::run() {
         int temp = 0;
 
         while (temp != -2 && !stopRequestedFlag) {
+            minimum++;
+            arrival->setMinimum(minimum);
             temp = p1.get_process();
 
             if (temp == -2) continue;
@@ -89,6 +100,8 @@ void SimulationWorker::run() {
         int temp = 0;
 
         while (temp != -2 && !stopRequestedFlag) {
+            minimum++;
+            arrival->setMinimum(minimum);
             temp = p1.get_process();
 
             if (temp == -2) continue;
@@ -99,7 +112,7 @@ void SimulationWorker::run() {
         }
     }
 
-
+    arrival->setMinimum(0);
     emit finished();  // done!
 }
 
