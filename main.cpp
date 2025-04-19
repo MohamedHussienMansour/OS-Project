@@ -140,6 +140,7 @@ private slots:
         ganttWindow->scene()->clear();
 
         resetBurstTime();
+        myprocesses.preserve(1000);
         currentXPosition = 0;
         bool liveMode = checkLiveMode->isChecked();
         QString selectedAlgorithm = schedulerType->currentText();
