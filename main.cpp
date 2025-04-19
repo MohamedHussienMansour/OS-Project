@@ -1,17 +1,25 @@
 #include "fcfs.h"
 #include <iostream>
+#include <vector>
 
 int main() {
-    FCFS_Scheduler scheduler;
+    std::vector<Process> processes = {
+        Process(1, 0, 4),
+        Process(2, 1, 3),
+        Process(3, 2, 1)
+    };
 
-    // Fixed scenario for testing
-    scheduler.add_process(1, 0, 4);
-    scheduler.add_process(2, 1, 3);
-    scheduler.add_process(3, 2, 1);
-    scheduler.add_process(4, 5, 2);
+    FCFS_Scheduler scheduler(processes);
 
-    scheduler.run();
+    while (true) {
+        int pid = scheduler.get_process();
+        if (pid == -2) break;
+        if (pid == -1)
+            std::cout << "Time Idle\n";
+        else
+            std::cout << "Time PID " << pid << "\n";
+    }
+
     scheduler.print_report();
-
     return 0;
 }
