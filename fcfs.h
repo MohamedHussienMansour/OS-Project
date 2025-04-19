@@ -2,37 +2,43 @@
 #define FCFS_H
 
 #include <vector>
-#include <queue>
+#include <iostream>
 
-class Process {
-public:
-    int pid;
+struct process {
+    int id;
     int arrival_time;
     int burst_time;
-    int remaining_time;
-    int start_time;
-    int finish_time;
-    int waiting_time;
-    int turnaround_time;
+    int completion_time;
 
-    Process(int id, int arrival, int burst);
-    void calculate_turn_time();         // added
-    void calculate_waiting_time();      // added
+    // Constructor that takes 4 parameters
+    process(int id, int arrival_time, int burst_time, int completion_time)
+        : id(id), arrival_time(arrival_time), burst_time(burst_time), completion_time(completion_time) {}
+
+    // Default constructor for the main.cpp
+    process() : id(0), arrival_time(0), burst_time(0), completion_time(0) {}
+
+    // Function to calculate turnaround time
+    void calculate_turn_time() {
+        turn_around_time = completion_time - arrival_time;
+    }
+
+    // Function to calculate waiting time
+    void calculate_waiting_time() {
+        waiting_time = turn_around_time - burst_time;
+    }
+
+    int turn_around_time; // Turnaround time
+    int waiting_time;     // Waiting time
 };
 
-class FCFS_Scheduler {
-private:
-    std::vector<Process>& processes;
-    std::queue<Process*> ready;
-    Process* current;
-    int time;
-
-    bool all_finished();
-
-public:
-    FCFS_Scheduler(std::vector<Process>& processes_ref); // changed constructor
-    int get_process();
-    void print_report();
-};
+class FCFS {
+    public:
+        FCFS(std::vector<process>& processes_ref);
+        int get_process();  // Returns the next process ID or -2 when done
+    private:
+        std::vector<process>& processes;
+        int current_index;
+        int current_burst_remaining;
+    };
 
 #endif // FCFS_H
