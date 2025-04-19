@@ -1,72 +1,35 @@
 #include "fcfs.h"
-#include <iostream>
 
-using namespace std;
+FCFS::FCFS(std::vector<process>& processes_ref) 
+    : processes(processes_ref), current_index(0), current_burst_remaining(0) {}
 
-Process::Process(int id, int arrival, int burst)
-    : pid(id), arrival_time(arrival), burst_time(burst), remaining_time(burst),
-      start_time(-1), finish_time(0), waiting_time(0), turnaround_time(0) {}
-
-void Process::calculate_turn_time() {
-    turnaround_time = finish_time - arrival_time;
-}
-
-void Process::calculate_waiting_time() {
-    waiting_time = turnaround_time - burst_time;
-}
-
-FCFS_Scheduler::FCFS_Scheduler(std::vector<Process>& processes_ref)
-    : processes(processes_ref) {
-    time = 0;
-    current = nullptr;
-}
-
-bool FCFS_Scheduler::all_finished() {
-    for (const auto& p : processes) {
-        if (p.remaining_time > 0)
-            return false;
-    }
-    return true;
-}
-
-int FCFS_Scheduler::get_process() {
-    if (all_finished()) {
+int FCFS::get_process() {
+    // If all processes are done
+    if (current_index >= processes.size())
         return -2;
+
+    // Initialize burst time of current process if first time visiting
+    if (current_burst_remaining == 0)
+        current_burst_remaining = processes[current_index].burst_time;
+
+    // Simulate execution
+    current_burst_remaining--;
+
+    // Process ID to return
+    int current_id = processes[current_index].id;
+
+    // If process finished
+    if (current_burst_remaining == 0) {
+        // Calculate TAT and WT
+        int end_time = 0;
+        for (int i = 0; i <= current_index; ++i)
+            end_time += processes[i].burst_time;
+
+        processes[current_index].turn_around_time = end_time - processes[current_index].arrival_time;
+        processes[current_index].waiting_time = processes[current_index].turn_around_time - processes[current_index].burst_time;
+
+        current_index++;
     }
 
-    for (auto& p : processes) {
-        if (p.arrival_time == time)
-            ready.push(&p);
-    }
-
-    time++;
-
-    if (!ready.empty()) {
-        current = ready.front();
-        current->remaining_time--;
-
-        if (current->start_time == -1)
-            current->start_time = time - 1;
-
-        if (current->remaining_time == 0) {
-            ready.pop();
-            current->finish_time = time;
-            current->calculate_turn_time();
-            current->calculate_waiting_time();
-        }
-
-        return current->pid;
-    } else {
-        return -1;
-    }
-}
-
-void FCFS_Scheduler::print_report() {
-    cout << "\nFinal FCFS Scheduling Results:\n";
-    cout << "PID\tArrival\tBurst\tStart\tCompletion\tWaiting\tTurnaround\n";
-    for (const auto& p : processes) {
-        cout << p.pid << "\t" << p.arrival_time << "\t" << p.burst_time << "\t"
-             << p.start_time << "\t" << p.finish_time << "\t\t"
-             << p.waiting_time << "\t" << p.turnaround_time << endl;
-    }
+    return current_id;
 }
