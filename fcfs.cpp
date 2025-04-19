@@ -7,18 +7,18 @@ Process::Process(int id, int arrival, int burst)
     : pid(id), arrival_time(arrival), burst_time(burst), remaining_time(burst),
       start_time(-1), finish_time(0), waiting_time(0), turnaround_time(0) {}
 
-void Process::calculate_times() {
+void Process::calculate_turn_time() {
     turnaround_time = finish_time - arrival_time;
+}
+
+void Process::calculate_waiting_time() {
     waiting_time = turnaround_time - burst_time;
 }
 
-FCFS_Scheduler::FCFS_Scheduler() {
+FCFS_Scheduler::FCFS_Scheduler(std::vector<Process>& processes_ref)
+    : processes(processes_ref) {
     time = 0;
     current = nullptr;
-}
-
-void FCFS_Scheduler::add_process(int pid, int arrival_time, int burst_time) {
-    processes.emplace_back(pid, arrival_time, burst_time);
 }
 
 bool FCFS_Scheduler::all_finished() {
@@ -29,37 +29,35 @@ bool FCFS_Scheduler::all_finished() {
     return true;
 }
 
-void FCFS_Scheduler::run() {
-    cout << "\nRunning FCFS Scheduler...\n";
-    cout << "Time\tRunning PID\n";
+int FCFS_Scheduler::get_process() {
+    if (all_finished()) {
+        return -2;
+    }
 
-    while (!all_finished()) {
-        for (auto& p : processes) {
-            if (p.arrival_time == time)
-                ready_queue.push(&p);
+    for (auto& p : processes) {
+        if (p.arrival_time == time)
+            ready.push(&p);
+    }
+
+    time++;
+
+    if (!ready.empty()) {
+        current = ready.front();
+        current->remaining_time--;
+
+        if (current->start_time == -1)
+            current->start_time = time - 1;
+
+        if (current->remaining_time == 0) {
+            ready.pop();
+            current->finish_time = time;
+            current->calculate_turn_time();
+            current->calculate_waiting_time();
         }
 
-        if (current == nullptr && !ready_queue.empty()) {
-            current = ready_queue.front();
-            ready_queue.pop();
-            if (current->start_time == -1)
-                current->start_time = time;
-        }
-
-        if (current != nullptr) {
-            cout << time << "\t" << current->pid << endl;
-            current->remaining_time--;
-
-            if (current->remaining_time == 0) {
-                current->finish_time = time + 1;
-                current->calculate_times();
-                current = nullptr;
-            }
-        } else {
-            cout << time << "\tIdle\n";
-        }
-
-        time++;
+        return current->pid;
+    } else {
+        return -1;
     }
 }
 
