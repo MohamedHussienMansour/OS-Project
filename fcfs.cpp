@@ -6,10 +6,10 @@ FCFS::FCFS(std::vector<process>& processes_ref)
       current_burst_remaining(0), processing(false) {}
 
 int FCFS::get_process() {
-    // Check if all processes are completed
+    // Check if all processes are completed (we consider finish_time > 0 as completed)
     bool all_done = true;
     for (const auto& p : processes) {
-        if (!p.completed) {
+        if (p.finish_time == 0 && p.burst_time > 0) {
             all_done = false;
             break;
         }
@@ -22,15 +22,14 @@ int FCFS::get_process() {
         int next_index = -1;
 
         for (int i = 0; i < processes.size(); ++i) {
-            if (!processes[i].completed && processes[i].arrival_time <= current_time) {
+            if (processes[i].finish_time == 0 && processes[i].arrival_time <= current_time) {
                 if (processes[i].arrival_time < earliest_arrival ||
-                    (processes[i].arrival_time == earliest_arrival && processes[i].id < processes[next_index].id)) {
+                    (processes[i].arrival_time == earliest_arrival && processes[i].pid < processes[next_index].pid)) {
                     earliest_arrival = processes[i].arrival_time;
                     next_index = i;
                 }
             }
         }
-
         if (next_index == -1) {
             current_time++;
             return -1; // Idle
@@ -40,20 +39,18 @@ int FCFS::get_process() {
             processing = true;
         }
     }
-
     // Execute the current process
     current_burst_remaining--;
-    int running_id = processes[current_index].id;
+    int running_id = processes[current_index].pid;
     current_time++;
 
     // If process is done
     if (current_burst_remaining == 0) {
         int end_time = current_time;
+        processes[current_index].finish_time = end_time;
         processes[current_index].turn_around_time = end_time - processes[current_index].arrival_time;
         processes[current_index].waiting_time = processes[current_index].turn_around_time - processes[current_index].burst_time;
-        processes[current_index].completed = true;
         processing = false;
     }
-
     return running_id;
 }
