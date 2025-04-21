@@ -1,35 +1,59 @@
 #include "fcfs.h"
+#include <limits>
 
-FCFS::FCFS(std::vector<process>& processes_ref) 
-    : processes(processes_ref), current_index(0), current_burst_remaining(0) {}
+FCFS::FCFS(std::vector<process>& processes_ref)
+    : processes(processes_ref), current_time(0), current_index(-1),
+      current_burst_remaining(0), processing(false) {}
 
 int FCFS::get_process() {
-    // If all processes are done
-    if (current_index >= processes.size())
-        return -2;
+    // Check if all processes are completed
+    bool all_done = true;
+    for (const auto& p : processes) {
+        if (!p.completed) {
+            all_done = false;
+            break;
+        }
+    }
+    if (all_done) return -2;
 
-    // Initialize burst time of current process if first time visiting
-    if (current_burst_remaining == 0)
-        current_burst_remaining = processes[current_index].burst_time;
+    // If no process is currently running, find the next available one
+    if (!processing) {
+        int earliest_arrival = std::numeric_limits<int>::max();
+        int next_index = -1;
 
-    // Simulate execution
-    current_burst_remaining--;
+        for (int i = 0; i < processes.size(); ++i) {
+            if (!processes[i].completed && processes[i].arrival_time <= current_time) {
+                if (processes[i].arrival_time < earliest_arrival ||
+                    (processes[i].arrival_time == earliest_arrival && processes[i].id < processes[next_index].id)) {
+                    earliest_arrival = processes[i].arrival_time;
+                    next_index = i;
+                }
+            }
+        }
 
-    // Process ID to return
-    int current_id = processes[current_index].id;
-
-    // If process finished
-    if (current_burst_remaining == 0) {
-        // Calculate TAT and WT
-        int end_time = 0;
-        for (int i = 0; i <= current_index; ++i)
-            end_time += processes[i].burst_time;
-
-        processes[current_index].turn_around_time = end_time - processes[current_index].arrival_time;
-        processes[current_index].waiting_time = processes[current_index].turn_around_time - processes[current_index].burst_time;
-
-        current_index++;
+        if (next_index == -1) {
+            current_time++;
+            return -1; // Idle
+        } else {
+            current_index = next_index;
+            current_burst_remaining = processes[current_index].burst_time;
+            processing = true;
+        }
     }
 
-    return current_id;
+    // Execute the current process
+    current_burst_remaining--;
+    int running_id = processes[current_index].id;
+    current_time++;
+
+    // If process is done
+    if (current_burst_remaining == 0) {
+        int end_time = current_time;
+        processes[current_index].turn_around_time = end_time - processes[current_index].arrival_time;
+        processes[current_index].waiting_time = processes[current_index].turn_around_time - processes[current_index].burst_time;
+        processes[current_index].completed = true;
+        processing = false;
+    }
+
+    return running_id;
 }
