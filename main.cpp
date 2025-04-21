@@ -6,13 +6,18 @@ using namespace std;
 int main()
 {
     vector<process> p1;
-    
+    /*
     p1.push_back(process(1,0,3,0));
     p1.push_back(process(2,3,2,0));
     p1.push_back(process(3,1,4,0));
     p1.push_back(process(4,2,3,0));
     p1.push_back(process(6,7,1,2));
+    FCFS f1(p1); */
+
+    p1.push_back(process(1, 5, 3, 0)); // Process 1: arrives at 5
+    p1.push_back(process(2, 0, 2, 0)); // Process 2: arrives at 0
     FCFS f1(p1);
+
     int temp=0;
     int time=0;
     while (temp!=-2)
