@@ -140,7 +140,7 @@ private slots:
         ganttWindow->scene()->clear();
 
         resetBurstTime();
-        myprocesses.preserve(1000);
+        myprocesses.reserve(1000);
         currentXPosition = 0;
         bool liveMode = checkLiveMode->isChecked();
         QString selectedAlgorithm = schedulerType->currentText();
@@ -240,6 +240,7 @@ private slots:
         QGraphicsTextItem *processText;
         if(processId==0) processText = new QGraphicsTextItem("idle");
         else processText = new QGraphicsTextItem(QString::number(processId));
+        processText->setDefaultTextColor(Qt::black);
 
         // Adjust text position to center it inside the rectangle
         processText->setPos(currentXPosition + (rectWidth - processText->boundingRect().width()) / 2,

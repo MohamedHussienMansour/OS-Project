@@ -17,17 +17,19 @@ bool sjf_preemptive::priority_sorting(process* p1, process* p2) {
 
 int sjf_preemptive::get_process() {
     if (all_finished()) return -2;
+    bool parrivedatTime=false;
 
     // Check for newly arrived processes
     for (auto& p : processes) {
         if (p.arrival_time == time) {
+            parrivedatTime=true;
             ready.push_back(&p);
         }
     }
 
     time++;
-
-    std::sort(ready.begin(), ready.end(), sjf_preemptive::priority_sorting);
+    if(parrivedatTime)
+        std::sort(ready.begin(), ready.end(), sjf_preemptive::priority_sorting);
 
     if (!ready.empty()) {
         curr_process = ready.front();
