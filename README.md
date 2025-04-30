@@ -1,156 +1,160 @@
-# OS-Project
-# CPU Scheduling Algorithms Documentation
+# 🧠 OS Project – CPU Scheduling Algorithms
 
-## Overview
+## 📘 Overview
 
-This project implements five CPU scheduling algorithms:
-1. First-Come, First-Served (FCFS)
-2. Shortest Job First - Non-Preemptive (SJF Non)
-3. Shortest Job First - Preemptive (SJF Preemptive)
-4. Priority Scheduling - Non-Preemptive
-5. Priority Scheduling - Preemptive
+This project implements **six popular CPU scheduling algorithms** used in operating systems to manage process execution:
 
-All implementations share a similar structure but differ in their scheduling logic.
+1. 🟦 **First-Come, First-Served (FCFS)**
+2. 🟨 **Shortest Job First – Non-Preemptive (SJF Non)**
+3. 🟨 **Shortest Job First – Preemptive (SJF Preemptive)**
+4. 🟥 **Priority Scheduling – Non-Preemptive**
+5. 🟥 **Priority Scheduling – Preemptive**
+6. 🌀 **Round Robin**
 
-## Common Structure
+Each algorithm follows a unified structure, differing only in their **scheduling logic** and **decision-making criteria**.
+
+---
+
+## 🏗️ Common Structure
 
 All scheduler classes:
+
 - Maintain a reference to the process list
 - Track current simulation time
-- Provide `all_finished()` to check completion
-- Implement `get_process()` to determine which process runs at each time unit
+- Provide `all_finished()` to check for completion
+- Implement `get_process()` to decide which process runs next
 
-## Algorithm Implementations
+---
 
-### 1. FCFS (First-Come, First-Served)
-- **Concept**: Processes execute in order of arrival
-- **Implementation**:
-  - Uses a queue for ready processes
-  - Always selects the front process
-  - Runs each process to completion before moving to next
+## 🧮 Algorithm Implementations
 
-### 2. SJF Non-Preemptive
-- **Concept**: Always runs the shortest available job to completion
-- **Implementation**:
-  - Maintains a ready queue sorted by burst time
-  - Only selects new process when CPU becomes idle
-  - Runs selected process to completion
+### 1️⃣ FCFS – First-Come, First-Served  
+📌 **Concept**: Executes processes in order of arrival  
+🔧 **Logic**:
+- Uses a simple FIFO queue
+- Runs each process to completion before switching
 
-### 3. SJF Preemptive
-- **Concept**: Can interrupt current process if a shorter job arrives
-- **Implementation**:
-  - Re-sorts ready queue whenever new processes arrive
-  - Always runs the shortest available job
-  - May preempt current process if a shorter one arrives
+---
 
-### 4. Priority Non-Preemptive
-- **Concept**: Runs highest priority job to completion
-- **Implementation**:
-  - Similar to SJF Non but sorts by priority
-  - Only selects new process when CPU becomes idle
-  - Runs selected process to completion
+### 2️⃣ SJF – Non-Preemptive  
+📌 **Concept**: Always picks the shortest job available  
+🔧 **Logic**:
+- Ready queue sorted by burst time
+- CPU stays with selected process until it finishes
 
-### 5. Priority Preemptive
-- **Concept**: Can interrupt current process if higher priority job arrives
-- **Implementation**:
-  - Re-sorts ready queue by priority when new processes arrive
-  - Always runs highest priority available job
-  - May preempt current process if higher priority job arrives
+---
 
-## Key Differences
+### 3️⃣ SJF – Preemptive  
+📌 **Concept**: Interrupts current process if a shorter job arrives  
+🔧 **Logic**:
+- Re-sorts ready queue on process arrival
+- Always runs the shortest available job
+- May preempt current process mid-execution
 
-- **Preemptive vs Non-Preemptive**: Preemptive versions re-evaluate scheduling decisions at each time unit, while non-preemptive versions only when CPU becomes idle
-- **Scheduling Criteria**: SJF uses burst time, Priority uses priority value
-- **Data Structures**: FCFS uses a queue, others use sorted vectors
+---
 
-All implementations track process completion times and calculate turnaround/waiting times when processes finish.
-## Round Robin Scheduling Algorithm
+### 4️⃣ Priority – Non-Preemptive  
+📌 **Concept**: Runs the highest priority process until it finishes  
+🔧 **Logic**:
+- Similar to SJF Non, but sorted by priority instead
+- CPU only switches when current process completes
 
-### Concept
-- **Time-sliced scheduling**: Each process gets equal CPU time (quantum) in cyclic order
-- **Fair allocation**: Prevents long processes from monopolizing CPU
-- **Preemptive**: Can interrupt current process when quantum expires
+---
 
-### Implementation Highlights
-1. **Key Parameters**:
-   - `quantum`: Fixed time slice for each process
-   - `time_slice`: Tracks how long current process has run
+### 5️⃣ Priority – Preemptive  
+📌 **Concept**: Interrupts if a higher priority process arrives  
+🔧 **Logic**:
+- Ready queue re-sorted by priority on arrivals
+- May preempt the running process
 
-2. **Core Logic**:
-   - Processes cycle through ready queue in FIFO order
-   - Runs current process until either:
-     * Quantum expires (time_slice == quantum)
-     * Process completes (burst_time == 0)
-   - Interrupted processes return to queue end
+---
 
-3. **Special Handling**:
-   - Tracks CPU state with `is_busy` flag
-   - Manages process transitions at quantum boundaries
-   - Updates process metrics upon completion
+## 🔁 Round Robin Scheduling
 
-4. **Behavior**:
-   - New arrivals added to queue when they arrive
-   - Always gives CPU to next ready process when:
-     * Quantum expires
-     * Current process finishes
-     * CPU becomes idle
+📌 **Concept**: Time-sliced, fair scheduling with equal CPU time per process  
+⚙️ **Key Parameters**:
+- `quantum`: CPU time slice
+- `time_slice`: Tracks time for current process
 
-This implementation provides fair CPU allocation while maintaining the preemptive nature of round robin scheduling. The quantum parameter allows tuning the balance between responsiveness and overhead from context switches.
-## Process Class and GUI Application Overview
+🧠 **Behavior**:
+- Processes cycle through in FIFO order
+- Preemption occurs when:
+  - Quantum expires
+  - Process finishes
+  - CPU becomes idle
 
-### Process Class (`process.h/cpp`)
-**Core Data Structure**:
-- Represents a single process with essential scheduling attributes:
-  - `pid`: Process identifier
-  - `burst_time`: Total CPU time required
-  - `arrival_time`: When process enters ready queue  
-  - `priority`: For priority-based scheduling
-  - `copy_burst_time`: Preserves original burst time
-  - Timing metrics: `waiting_time`, `turn_around_time`, `finish_time`
+🔍 **Highlights**:
+- Tracks CPU state using `is_busy`
+- Ensures fairness across all processes
+- Interrupted processes are sent to the back of the queue
 
-**Key Methods**:
-- `calculate_waiting_time()`: Computes time spent waiting
-- `calculate_turn_time()`: Computes total completion time
-- Preserves original burst time for simulation resets
+---
 
-### GUI Application Architecture
+## 🧱 Process Class
 
-**Main Components**:
-1. **SchedulerGUI (Main Window)**:
-   - Algorithm selection (FCFS, SJF, Priority, Round Robin)
-   - Process management table
-   - Simulation controls (Start/Reset)
-   - Live mode toggle
+📁 **File**: `process.h / process.cpp`  
+🧬 **Attributes**:
+- `pid`, `arrival_time`, `burst_time`, `priority`
+- Timing: `waiting_time`, `turn_around_time`, `finish_time`
 
-2. **GanttChartWindow**:
-   - Visualizes process execution timeline
-   - Dynamically updates during simulation
-   - Rectangles represent process execution periods
+🔧 **Methods**:
+- `calculate_waiting_time()`
+- `calculate_turn_time()`
+- Maintains original burst time for resets
 
-3. **SimulationWorker**:
-   - Runs scheduling algorithms in background thread
-   - Supports all 6 scheduling variants
-   - Emits signals for GUI updates
-   - Handles live mode pacing
+---
 
-**Key Features**:
-- Dynamic UI adaptation (shows/hides quantum/priority fields as needed)
-- Process table with real-time remaining time updates
-- Gantt chart visualization with process IDs
-- Metrics calculation (average wait/turnaround times)
-- Thread-safe simulation execution
+## 🖥️ GUI Application Overview
 
-**Workflow**:
-1. User adds processes with parameters
-2. Selects scheduling algorithm
-3. Starts simulation (live or instant)
-4. Worker executes algorithm, updates GUI via signals
-5. Results displayed in Gantt chart and metrics
+Built with **Qt**, the GUI provides a real-time, interactive visualization of scheduling algorithms.
 
-**Technical Highlights**:
-- Qt signals/slots for thread-safe GUI updates
-- QGraphicsScene for Gantt chart rendering
-- Atomic flag for simulation interruption
-- Polymorphic algorithm execution via worker
+### 🧩 Components
 
-The application provides an interactive way to visualize and compare CPU scheduling algorithms while maintaining clean separation between simulation logic and presentation.
+#### 1. `SchedulerGUI`  
+- Algorithm selector  
+- Process table  
+- Simulation controls (Start/Reset)  
+- Live mode toggle  
+
+#### 2. `GanttChartWindow`  
+- Dynamic Gantt chart showing process execution  
+- Real-time updates as simulation runs  
+
+#### 3. `SimulationWorker`  
+- Runs selected scheduling algorithm on background thread  
+- Sends signals to update UI components  
+- Supports live/instant execution modes  
+
+---
+
+### ⭐ Features
+
+- 🧠 Adaptive UI: Shows/hides priority or quantum fields based on algorithm  
+- 📊 Real-time process table updates  
+- 🖼️ Visual Gantt chart with process IDs  
+- 📈 Metrics: Waiting time, turnaround time (individual & average)  
+- 🧵 Thread-safe execution using Qt signals/slots  
+- 🎯 Polymorphic algorithm execution  
+
+---
+
+## ⚙️ How It Works
+
+1. User adds processes via the GUI  
+2. Chooses scheduling algorithm  
+3. Starts the simulation (Live/Instant)  
+4. Worker thread simulates execution  
+5. Results shown in Gantt chart + stats  
+
+---
+
+## 🏁 Summary
+
+This project combines core OS scheduling concepts with modern GUI features for a comprehensive learning and visualization tool.  
+It demonstrates:
+
+- ✨ Clear architectural separation  
+- 🔄 Real-time simulations  
+- 📚 Accurate scheduling logic  
+
+> 💡 Ideal for OS course projects, demos, or educational tools.
