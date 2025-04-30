@@ -1,2 +1,0 @@
-# OS-Project
-process scheduler 
