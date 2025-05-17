@@ -1,2 +1,2 @@
 # OS-Project
-process scheduler 
+process schedulerr
